@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  @apply text-gray-700;
+}
+
+.form-group {
+  .form-control {
+    @apply border border-gray-200 rounded-md outline-0 py-2 px-3 w-full;
+  }
+}
+
+.btn {
+  @apply py-2 px-4 bg-indigo-500 text-white rounded-md flex items-center justify-center;
+}

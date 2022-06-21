@@ -1,0 +1,8 @@
+{
+  "name": "debugger",
+  "workspaces": [
+    "./packages/*"
+  ],
+  "private": true,
+  "license": "MIT"
+}
