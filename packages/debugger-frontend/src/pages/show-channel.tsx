@@ -14,7 +14,7 @@ export const ShowChannelPage: FC = (): ReactElement => {
     const [eventSource, eventSourceStatus] = useEventSource(eventSourceUrl);
     const [messages, setMessages] = useState<Message[]>([]);
     const postUrl = useMemo(() => {
-        return window.location.protocol + '//' + window.location.hostname + '/channel/' + id + '/message' ;
+        return window.location.protocol + '//' + process.env.API_URL + '/channel/' + id + '/message' ;
     }, [window.location, id]);
 
     useEventSourceListener(eventSource, ['message'], (event) => {
@@ -32,7 +32,7 @@ export const ShowChannelPage: FC = (): ReactElement => {
         <div className="flex flex-col gap-5">
             {messages.length === 0 ?
                 <div className="bg-white rounded-md shadow-sm p-4 flex flex-col relative">
-                    <b>Post Message:</b> <em><code>{'curl -X POST -H "Content-Type: application/json" -d {"content": {"message": "Hi!"}}" ' + postUrl}</code></em>
+                    <b>Post Message:</b> <em><code>{'curl -X POST -H "Content-Type: application/json" -d "{\"content\": {\"message\": \"Hi!\"}}" ' + postUrl}</code></em>
                 </div>
                 :
                 null
