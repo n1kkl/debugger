@@ -4,8 +4,10 @@ import {useEventSource, useEventSourceListener} from "@react-nano/use-event-sour
 import {useApiUrl} from "../hooks/use-api-url";
 import {toast} from "react-toastify";
 import {Message} from "../types/message";
+import stc from 'string-to-color';
 // @ts-ignore
 import ReactJson from 'react-json-view';
+import {Tag} from "../types/tag";
 
 export const ShowChannelPage: FC = (): ReactElement => {
     const {id} = useParams<{ id: string }>();
@@ -13,12 +15,22 @@ export const ShowChannelPage: FC = (): ReactElement => {
     const eventSourceUrl = useApiUrl('/channel/' + (id ?? '0'));
     const [eventSource, eventSourceStatus] = useEventSource(eventSourceUrl);
     const [messages, setMessages] = useState<Message[]>([]);
+    const [channelTags, setChannelTags] = useState<{[id: string]: Tag}>({});
     const postUrl = useMemo(() => {
         return process.env.REACT_APP_API_URL + '/channel/' + id + '/message' ;
     }, [window.location, id]);
 
     useEventSourceListener(eventSource, ['message'], (event) => {
-        setMessages([JSON.parse(event.data), ...messages]);
+        const message: Message = JSON.parse(event.data);
+        setMessages([message, ...messages]);
+
+        const oldChannelTags = Object.assign({}, channelTags);
+        for (const tag of message.tags.map((tag) => tag.tag)) {
+            if (!channelTags[tag.id]) {
+                oldChannelTags[tag.id] = tag;
+            }
+        }
+        setChannelTags(oldChannelTags);
     }, [messages]);
 
     useEffect(() => {
@@ -27,6 +39,10 @@ export const ShowChannelPage: FC = (): ReactElement => {
             toast.error('This channel does not exist.');
         }
     }, [eventSourceStatus]);
+
+    useEffect(() => {
+        console.log(channelTags);
+    }, [channelTags]);
 
     return (
         <div className="flex flex-col gap-5">
@@ -37,15 +53,34 @@ export const ShowChannelPage: FC = (): ReactElement => {
                 :
                 null
             }
-            {messages.reverse().map((message) => (
-                <div key={message.id} className="bg-white rounded-md shadow-sm p-4 flex flex-col relative">
-                    <ReactJson src={JSON.parse(message.content)} name={null} groupArraysAfterLength={10} enableClipboard={false} displayDataTypes={false}/>
-                    <div className="ml-auto text-gray-400 absolute bottom-1 right-1 py-1 px-3">
-                        <small>{new Date(message.createdAt).toLocaleDateString()}, </small>
-                        <small>{new Date(message.createdAt).toLocaleTimeString()}</small>
+            {messages.length ?
+                <>
+                    <div className="bg-white rounded-md shadow-sm p-4 flex flex-wrap gap-1">
+                        <b className="mr-2">Tags:</b>
+                        {Object.keys(channelTags).map((id) => channelTags[id]).map((tag) => (
+                            <small key={tag.id} className="border-2 rounded-xl px-3" style={{backgroundColor: stc(tag.title) + '55', borderColor: stc(tag.title)}}>{tag.title} {}</small>
+                        ))}
                     </div>
-                </div>
-            ))}
+                    {messages.reverse().map((message) => (
+                        <div key={message.id} className="bg-white rounded-md shadow-sm p-4 flex flex-col">
+                            <ReactJson src={JSON.parse(message.content)} name={null} groupArraysAfterLength={10} enableClipboard={false} displayDataTypes={false}/>
+                            <div className="flex gap-2 mt-2">
+                                <div className="flex flex-wrap gap-1">
+                                    {message.tags.map((tag) => tag.tag).map((tag) => (
+                                        <small key={tag.id} className="border-2 rounded-xl px-3" style={{backgroundColor: stc(tag.title) + '55', borderColor: stc(tag.title)}}>{tag.title} {}</small>
+                                    ))}
+                                </div>
+                                <div className="ml-auto text-gray-400">
+                                    <small>{new Date(message.createdAt).toLocaleDateString()}, </small>
+                                    <small>{new Date(message.createdAt).toLocaleTimeString()}</small>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </>
+                :
+                null
+            }
         </div>
     );
 };
