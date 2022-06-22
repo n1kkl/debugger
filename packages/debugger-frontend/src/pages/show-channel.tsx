@@ -14,7 +14,7 @@ export const ShowChannelPage: FC = (): ReactElement => {
     const [eventSource, eventSourceStatus] = useEventSource(eventSourceUrl);
     const [messages, setMessages] = useState<Message[]>([]);
     const postUrl = useMemo(() => {
-        return window.location.protocol + '//' + process.env.REACT_APP_API_URL + '/channel/' + id + '/message' ;
+        return process.env.REACT_APP_API_URL + '/channel/' + id + '/message' ;
     }, [window.location, id]);
 
     useEventSourceListener(eventSource, ['message'], (event) => {
