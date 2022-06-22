@@ -43,7 +43,7 @@ export class ChannelController {
             this.channelService.observeMessages(channel.id).pipe(map((message) => ({
                 data: message
             }))),
-            interval(5000).pipe(map(_) => ({data: 'ok'}))
+            interval(10000).pipe(map((_) => ({ data: 'ok', type: 'heartbeat' })))
         );
     }
 }
