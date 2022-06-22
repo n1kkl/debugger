@@ -32,7 +32,7 @@ export const ShowChannelPage: FC = (): ReactElement => {
         <div className="flex flex-col gap-5">
             {messages.length === 0 ?
                 <div className="bg-white rounded-md shadow-sm p-4 flex flex-col relative">
-                    <b>Post Message:</b> <em><code>{'curl -X POST -H "Content-Type: application/json" -d "{\"content\": {\"message\": \"Hi!\"}}" ' + postUrl}</code></em>
+                    <b>Post Message:</b> <em><code>{'curl -X POST -H "Content-Type: application/json" -d "{\\"content\\": {\\"message\\": \\"Hi!\\"}}" ' + postUrl}</code></em>
                 </div>
                 :
                 null
